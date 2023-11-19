@@ -5,20 +5,22 @@
 #include <string>
 #include <list>
 
-template <class T>
 class Obj
 {
 public:
-	Obj();
+	Obj()=default;
+	Obj(std::string Key, int Value);
 	~Obj();
 	std::string key;
-	T value;
+	int value;
 	Obj* prev{ nullptr };
 	Obj* next{ nullptr };
 };
 
-template <class T>
-Obj<T>::~Obj(){}
+
+Obj::Obj(std::string Key, int Value):key(Key),value(Value){}
+
+Obj::~Obj(){}
 
 template <class T>
 class TH
@@ -27,7 +29,7 @@ public:
 	TH()=default;
 	~TH();
 	int size{ 0 }, Max_Size{ 1 } , Expansion{ 2 };
-	Obj<int>** objs = new Obj<int>*[Max_Size];
+	Obj** objs = new Obj*[Max_Size];
 	int HashFunc(std::string key);
 	void Add(std::string key, T value);
 };
@@ -41,7 +43,7 @@ int TH<T>::HashFunc(std::string key)
 	int index = 0;
 	for (int i = 0; i < key.length(); ++i)
 	{
-		index += (int(key[i]) * pow(31, key.length() - i + 1));
+		index += (key[i] * pow(31, key.length() - i + 1));
 	}
 	index %= this->Max_Size;
 	index = abs(index);
@@ -54,17 +56,26 @@ void TH<T>::Add(std::string key, T value)
 	int index = HashFunc(key);
 	if (objs[index] == nullptr)
 	{
-		//
+		Obj* obj = new Obj(key, value);
+		objs[index] = obj;
+		obj = nullptr;
+		delete obj;
 	}
 	else
 	{
-		//
+		Obj* obj = new Obj(key, value);
+		int i = 0;
+		for (;objs[i]->next != nullptr;++i){}
+		objs[i]->next = obj;
+		objs[i]->next->prev = objs[i];
+		obj = nullptr;
+		delete obj;
 	}
 }
 
 int main()
 {
 	TH<int>* th = new TH<int>();
-	//
+	th->Add("Manish", 16);
 	return 0;
 }
