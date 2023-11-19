@@ -5,6 +5,7 @@
 #include <string>
 #include <list>
 
+template <class T>
 class Obj
 {
 public:
@@ -12,27 +13,38 @@ public:
 	Obj(std::string Key, int Value);
 	~Obj();
 	std::string key;
-	int value;
+	T value;
 	Obj* prev{ nullptr };
 	Obj* next{ nullptr };
 };
 
+template<class T>
+Obj<T>::Obj(std::string Key, int Value) : key(Key),value(Value){}
 
-Obj::Obj(std::string Key, int Value):key(Key),value(Value){}
-
-Obj::~Obj(){}
+template <class T>
+Obj<T>::~Obj(){}
 
 template <class T>
 class TH
 {
 public:
-	TH()=default;
+	TH();
 	~TH();
 	int size{ 0 }, Max_Size{ 1 } , Expansion{ 2 };
-	Obj** objs = new Obj*[Max_Size];
+	Obj<T>** objs = new Obj<T>*[Max_Size];
 	int HashFunc(std::string key);
 	void Add(std::string key, T value);
+	Obj<T>* Search(std::string key);
 };
+
+template<class T>
+TH<T>::TH()
+{
+	for (int i = 0; i < Max_Size; ++i)
+	{
+		objs[i] = nullptr;
+	}
+}
 
 template <class T>
 TH<T>::~TH() {}
@@ -53,29 +65,72 @@ int TH<T>::HashFunc(std::string key)
 template<class T>
 void TH<T>::Add(std::string key, T value)
 {
+	if (this->size + 1 > this->Max_Size)
+	{
+		this->Max_Size *= this->Expansion;
+		Obj<T>** copy_objs = this->objs;
+		this->objs = nullptr;
+		this->objs = new Obj<T>*[Max_Size];
+		for (int i = 0; i < Max_Size; ++i)
+		{
+			objs[i] = nullptr;
+		}
+		for (int i = 0; i < this->size; ++i)
+		{
+			this->objs[i] = copy_objs[i];
+		}
+	}
 	int index = HashFunc(key);
 	if (objs[index] == nullptr)
 	{
-		Obj* obj = new Obj(key, value);
+		Obj<T>* obj = new Obj<T>(key, value);
 		objs[index] = obj;
 		obj = nullptr;
 		delete obj;
 	}
 	else
 	{
-		Obj* obj = new Obj(key, value);
-		int i = 0;
-		for (;objs[i]->next != nullptr;++i){}
-		objs[i]->next = obj;
-		objs[i]->next->prev = objs[i];
+		Obj<T>* obj = new Obj<T>(key, value);
+		Obj<T>* obj2 = objs[index];
+		bool flag = false;
+		while (obj2->next != nullptr)
+		{
+			if (obj2->key == obj->key)
+			{
+				obj2->value = obj->value;
+				flag = true;
+				break;
+			}
+			obj2 = obj2->next;
+		}
+		if (!flag)
+		{
+			obj2->next = obj;
+			obj->prev = obj2;
+		}
 		obj = nullptr;
 		delete obj;
+		obj2 = nullptr;
+		delete obj2;
 	}
+	++this->size;
+}
+
+template<class T>
+Obj<T>* TH<T>::Search(std::string key)
+{
+	//
 }
 
 int main()
 {
 	TH<int>* th = new TH<int>();
 	th->Add("Manish", 16);
+	th->Add("Vartika", 14);
+	th->Add("ITT", 5);
+	th->Add("elite_Programmer", 4);
+	th->Add("pluto14", 14);
+	th->Add("GeeksForGeeks", 11);
+	//
 	return 0;
 }
