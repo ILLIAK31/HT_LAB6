@@ -35,6 +35,7 @@ public:
 	int HashFunc(std::string key);
 	void Add(std::string key, T value);
 	Obj<T>* Search(std::string key);
+	bool Delete(std::string key);
 };
 
 template<class T>
@@ -118,6 +119,31 @@ void TH<T>::Add(std::string key, T value)
 
 template<class T>
 Obj<T>* TH<T>::Search(std::string key)
+{
+	for (int index = 0; index <= this->size; ++index)
+	{
+		if (this->objs[index] == nullptr)
+		{
+			continue;
+		}
+		else
+		{
+			Obj<T>* obj2 = objs[index];
+			while (obj2 != nullptr)
+			{
+				if (obj2->key == key)
+				{
+					return obj2;
+				}
+				obj2 = obj2->next;
+			}
+		}
+	}
+	return nullptr;
+}
+
+template<class T>
+bool TH<T>::Delete(std::string key)
 {
 	//
 }
