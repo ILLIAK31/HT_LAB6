@@ -36,6 +36,7 @@ public:
 	void Add(std::string key, T value);
 	Obj<T>* Search(std::string key);
 	bool Delete(std::string key);
+	void Clear();
 };
 
 template<class T>
@@ -145,6 +146,51 @@ Obj<T>* TH<T>::Search(std::string key)
 template<class T>
 bool TH<T>::Delete(std::string key)
 {
+	for (int index = 0; index <= this->size; ++index)
+	{
+		if (this->objs[index] == nullptr)
+		{
+			continue;
+		}
+		else
+		{
+			Obj<T>* obj2 = objs[index];
+			while (obj2 != nullptr)
+			{
+				if (obj2->key == key)
+				{
+					if (obj2->prev != nullptr && obj2->next != nullptr)
+					{
+						obj2->prev->next = obj2->next;
+						obj2->next->prev = obj2->prev;
+					}
+					else if (obj2->prev == nullptr && obj2->next != nullptr)
+					{
+						this->objs[index] = obj2->next;
+						obj2->next->prev = nullptr;
+					}
+					else if(obj2->prev != nullptr && obj2->next == nullptr)
+					{
+						obj2->prev->next = nullptr;
+					}
+					else if (obj2->prev == nullptr && obj2->next == nullptr)
+					{
+						this->objs[index] = nullptr;
+					}
+					delete obj2;
+					obj2 = nullptr;
+					return true;
+				}
+				obj2 = obj2->next;
+			}
+		}
+	}
+	return false;
+}
+
+template<class T>
+void TH<T>::Clear()
+{
 	//
 }
 
@@ -157,6 +203,8 @@ int main()
 	th->Add("elite_Programmer", 4);
 	th->Add("pluto14", 14);
 	th->Add("GeeksForGeeks", 11);
+	//
+	// Clear
 	//
 	return 0;
 }
