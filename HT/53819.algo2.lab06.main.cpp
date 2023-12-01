@@ -37,6 +37,7 @@ public:
 	Obj<T>* Search(std::string key);
 	bool Delete(std::string key);
 	void Clear();
+	void Print();
 };
 
 template<class T>
@@ -121,6 +122,8 @@ void TH<T>::Add(std::string key, T value)
 template<class T>
 Obj<T>* TH<T>::Search(std::string key)
 {
+	if (this->size == 0)
+		return nullptr;
 	for (int index = 0; index <= this->size; ++index)
 	{
 		if (this->objs[index] == nullptr)
@@ -191,6 +194,40 @@ bool TH<T>::Delete(std::string key)
 template<class T>
 void TH<T>::Clear()
 {
+	for (int i = 0; i < this->size; ++i)
+	{
+		if (this->objs[i] == nullptr)
+		{
+			continue;
+		}
+		else
+		{
+			Obj<T>* obj2 = objs[i];
+			while (obj2 != nullptr)
+			{
+				if (obj2->next != nullptr)
+				{
+					obj2 = obj2->next;
+					this->Delete(obj2->prev->key);
+				}
+				else
+				{
+					this->Delete(obj2->key);
+					break;
+				}
+			}
+			obj2 = nullptr;
+			delete obj2;
+		}
+	}
+	this->size = 0;
+	this->Max_Size = 1;
+	this->objs = nullptr;
+}
+
+template<class T>
+void TH<T>::Print()
+{
 	//
 }
 
@@ -204,7 +241,7 @@ int main()
 	th->Add("pluto14", 14);
 	th->Add("GeeksForGeeks", 11);
 	//
-	// Clear
+	th->Print();
 	//
 	return 0;
 }
