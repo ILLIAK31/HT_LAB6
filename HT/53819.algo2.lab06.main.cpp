@@ -3,7 +3,8 @@
 // ki53819@zut.edu.pl
 #include <iostream>
 #include <string>
-#include <list>
+#include <vector>
+
 
 template <class T>
 class Obj
@@ -38,6 +39,7 @@ public:
 	bool Delete(std::string key);
 	void Clear();
 	void Print();
+	void Rehash();
 };
 
 template<class T>
@@ -70,18 +72,7 @@ void TH<T>::Add(std::string key, T value)
 {
 	if (this->size + 1 > this->Max_Size)
 	{
-		this->Max_Size *= this->Expansion;
-		Obj<T>** copy_objs = this->objs;
-		this->objs = nullptr;
-		this->objs = new Obj<T>*[Max_Size];
-		for (int i = 0; i < Max_Size; ++i)
-		{
-			objs[i] = nullptr;
-		}
-		for (int i = 0; i < this->size; ++i)
-		{
-			this->objs[i] = copy_objs[i];
-		}
+		Rehash();
 	}
 	int index = HashFunc(key);
 	if (objs[index] == nullptr)
@@ -124,7 +115,7 @@ Obj<T>* TH<T>::Search(std::string key)
 {
 	if (this->size == 0)
 		return nullptr;
-	for (int index = 0; index <= this->size; ++index)
+	for (int index = 0; index <= this->Max_Size; ++index)
 	{
 		if (this->objs[index] == nullptr)
 		{
@@ -149,7 +140,7 @@ Obj<T>* TH<T>::Search(std::string key)
 template<class T>
 bool TH<T>::Delete(std::string key)
 {
-	for (int index = 0; index <= this->size; ++index)
+	for (int index = 0; index <= this->Max_Size; ++index)
 	{
 		if (this->objs[index] == nullptr)
 		{
@@ -194,7 +185,7 @@ bool TH<T>::Delete(std::string key)
 template<class T>
 void TH<T>::Clear()
 {
-	for (int i = 0; i < this->size; ++i)
+	for (int i = 0; i < this->Max_Size; ++i)
 	{
 		if (this->objs[i] == nullptr)
 		{
@@ -228,20 +219,123 @@ void TH<T>::Clear()
 template<class T>
 void TH<T>::Print()
 {
+	std::cout << "\t| Hash Table |\n";
+	std::cout << "\t| Size : " << this->size << " |\n";
+	std::cout << "\t| Max size : " << this->Max_Size << " |\n";
+	for (int i = 0; i < this->Max_Size; ++i)
+	{
+		if (this->size == 0)
+			break;
+		if (this->objs[i] == nullptr)
+		{
+			continue;
+		}
+		else
+		{
+			Obj<T>* obj2 = objs[i];
+			while (obj2 != nullptr)
+			{
+				int index = HashFunc(obj2->key);
+				std::cout << i << " | " << obj2->key << " -> " << obj2->value << " | ";
+				if (obj2->next == nullptr)
+					break;
+				obj2 = obj2->next;
+			}
+			std::cout << std::endl;
+			obj2 = nullptr;
+			delete obj2;
+		}
+	}
+	std::cout << "\t| Min size : 1 |\n" << "\t| Max size : " << this->Max_Size << " |\n";
 	//
+}
+
+template<class T>
+void TH<T>::Rehash()
+{
+	std::vector<Obj<T>*> links;
+	for (int i = 0; i < Max_Size; ++i)
+	{
+		if (this->size == 0)
+			break;
+		if (objs[i] == nullptr)
+		{
+			continue;
+		}
+		else
+		{
+			Obj<T>* obj2 = objs[i];
+			while (obj2 != nullptr)
+			{
+				links.push_back(obj2);
+				if (obj2->next == nullptr)
+					break;
+				else
+					obj2 = obj2->next;
+			}
+		}
+	}
+	this->Max_Size *= this->Expansion;
+	this->objs = new Obj<T>*[Max_Size];
+	for (int i = 0; i < Max_Size; ++i)
+	{
+		objs[i] = nullptr;
+	}
+	for (int l = 0; l < links.size(); ++l)
+	{
+		Obj<T>* OBJ = links[l];
+		OBJ->prev = OBJ->next = nullptr;
+		std::string key = OBJ->key;
+		T value = OBJ->value;
+		int index = HashFunc(key);
+		if (objs[index] == nullptr)
+		{
+			Obj<T>* obj = new Obj<T>(key, value);
+			objs[index] = obj;
+			obj = nullptr;
+			delete obj;
+		}
+		else
+		{
+			Obj<T>* obj = new Obj<T>(key, value);
+			Obj<T>* obj2 = objs[index];
+			bool flag = false;
+			while (obj2->next != nullptr)
+			{
+				if (obj2->key == obj->key)
+				{
+					obj2->value = obj->value;
+					flag = true;
+					break;
+				}
+				obj2 = obj2->next;
+			}
+			if (!flag)
+			{
+				obj2->next = obj;
+				obj->prev = obj2;
+			}
+			obj = nullptr;
+			delete obj;
+			obj2 = nullptr;
+			delete obj2;
+		}
+		OBJ = nullptr;
+		delete OBJ;
+	}
 }
 
 int main()
 {
 	TH<int>* th = new TH<int>();
+	//
 	th->Add("Manish", 16);
 	th->Add("Vartika", 14);
 	th->Add("ITT", 5);
 	th->Add("elite_Programmer", 4);
 	th->Add("pluto14", 14);
 	th->Add("GeeksForGeeks", 11);
-	//
-	th->Print();
+	th->Print(); 
 	//
 	return 0;
 }
