@@ -247,7 +247,6 @@ void TH<T>::Print()
 		}
 	}
 	std::cout << "\t| Min size : 1 |\n" << "\t| Max size : " << this->Max_Size << " |\n";
-	//
 }
 
 template<class T>
@@ -329,12 +328,16 @@ int main()
 {
 	TH<int>* th = new TH<int>();
 	//
-	th->Add("Manish", 16);
-	th->Add("Vartika", 14);
-	th->Add("ITT", 5);
-	th->Add("elite_Programmer", 4);
-	th->Add("pluto14", 14);
-	th->Add("GeeksForGeeks", 11);
+	th->Add("mudwrl", 425811);
+	th->Add("fixxie", 854961);
+	th->Add("cixxih", 108209);
+	th->Add("dnjqyl", 761203);
+	th->Add("hwmdzu",493654);
+	th->Add("kudwrw",273624);
+	th->Add("nnjqyv",392255);
+	th->Add("ludwsb",257412);
+	th->Add("nlbeqy",721784);
+	th->Add("yudwsb",891592);
 	th->Print(); 
 	//
 	return 0;
