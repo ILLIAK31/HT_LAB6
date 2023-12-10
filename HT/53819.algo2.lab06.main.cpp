@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-
 template <class T>
 class Obj
 {
@@ -115,7 +114,7 @@ Obj<T>* TH<T>::Search(std::string key)
 {
 	if (this->size == 0)
 		return nullptr;
-	for (int index = 0; index <= this->Max_Size; ++index)
+	for (int index = 0; index < this->Max_Size; ++index)
 	{
 		if (this->objs[index] == nullptr)
 		{
@@ -140,7 +139,7 @@ Obj<T>* TH<T>::Search(std::string key)
 template<class T>
 bool TH<T>::Delete(std::string key)
 {
-	for (int index = 0; index <= this->Max_Size; ++index)
+	for (int index = 0; index < this->Max_Size; ++index)
 	{
 		if (this->objs[index] == nullptr)
 		{
@@ -324,8 +323,68 @@ void TH<T>::Rehash()
 	}
 }
 
+std::string RK()
+{
+	std::vector<char> L =
+	{
+	'a', 'b', 'c', 'd', 'e',
+	'f','g', 'h', 'i', 'j',
+	'k','l', 'm', 'n', 'o',
+	'p','q', 'r', 's', 't',
+	'u','v', 'w', 'x', 'y',
+	'z','A', 'B', 'C', 'D',
+	'E','F', 'G', 'H','I',
+	'J','K', 'L', 'M', 'N',
+	'O','P', 'Q', 'R', 'S',
+	'T','U', 'V', 'W', 'X',
+	'Y', 'Z'
+	};
+	std::string KEY = "";
+	for (int index = 0; index < 6; ++index)
+	{
+		KEY += L[rand() % 52];
+	}
+	return KEY;
+}
+
 int main()
 {
 	TH<int>* th = new TH<int>();
+	int hit{ 0 };
+	double avr{ 0 };
+	clock_t timer1, timer2, timer3, timer4;
+	timer1 = clock();
+	for (int index = 0; index < 1000; ++index)
+	{
+		std::string key = RK();
+		timer3 = clock();
+		th->Add(key, index);
+		timer4 = clock();
+		avr += (timer4 - timer3) / (double)CLOCKS_PER_SEC;
+		key = "";
+	}
+	timer2 = clock();
+	th->Print();
+	avr /= 1000;
+	avr *= 1000;
+	std::cout << "| Full time : " << (timer2-timer1)/(double)CLOCKS_PER_SEC << " s | Average time : " << avr << " ms |\n";
+	avr = 0;
+	timer1 = clock();
+	for (int index = 0; index < 1000; ++index)
+	{
+		std::string key = RK();
+		timer3 = clock();
+		Obj<int>* OBJ = th->Search(key);
+		timer4 = clock();
+		if (OBJ != nullptr)
+			++hit;
+		avr += (timer4 - timer3) / (double)CLOCKS_PER_SEC;
+	}
+	timer2 = clock();
+	avr /= 1000;
+	avr *= 1000;
+	std::cout << "| Full time : " << (timer2 - timer1) / (double)CLOCKS_PER_SEC << " s | Average time : " << avr << " ms | Hits : " << hit << " |\n";
+	th->Clear();
+	delete th;
 	return 0;
 }
